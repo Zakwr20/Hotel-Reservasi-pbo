@@ -1,0 +1,125 @@
+classDiagram
+    direction TB
+
+    class Persistable {
+        <<interface>>
+        +getId() String
+        +toRecord() String[]
+    }
+
+    class Kamar {
+        <<abstract>>
+        -String nomor
+        -int lantai
+        -double hargaPerMalam
+        -int kapasitas
+        -StatusKamar status
+        +getJenis()* JenisKamar
+        +hitungBiaya(int malam)* double
+        +hitungBiaya(int malam, int jumlahTamu) double
+        +hitungBiaya(LocalDate in, LocalDate out) double
+        +getFasilitas()* String
+        +setHargaPerMalam(double) throws ValidasiException
+    }
+    class KamarStandard {
+        -String tipeKasur
+        +hitungBiaya(int malam) double
+    }
+    class KamarDeluxe {
+        -boolean termasukSarapan
+        +hitungBiaya(int malam) double
+    }
+    class KamarSuite {
+        -int jumlahRuang
+        +hitungBiaya(int malam) double
+    }
+
+    class Tamu {
+        -String id
+        -String nama
+        -String noIdentitas
+        -String telepon
+        -String email
+        -JenisKelamin jenisKelamin
+        -boolean member
+    }
+
+    class Reservasi {
+        -String id
+        -Tamu tamu
+        -Kamar kamar
+        -LocalDate checkIn
+        -LocalDate checkOut
+        -int jumlahTamu
+        -StatusReservasi status
+        -List~LayananTambahan~ layanan
+        +hitungBiayaKamar() double
+        +hitungBiayaLayanan() double
+        +hitungDiskon() double
+        +hitungTotal() double
+        +bentrokDengan(LocalDate, LocalDate) boolean
+    }
+
+    class Pengguna {
+        <<abstract>>
+        -String username
+        -String passwordHash
+        -String namaLengkap
+        +getPeran()* String
+        #getDaftarHak()* Set~HakAkses~
+        +punyaAkses(HakAkses) boolean
+        +punyaAkses(HakAkses...) boolean
+    }
+    class Admin
+    class Resepsionis
+
+    class KamarFactory {
+        +buat(JenisKamar, ...) Kamar
+    }
+
+    class Dao~T~ {
+        <<interface>>
+        +findAll() List~T~
+        +findById(String) Optional~T~
+        +insert(T)
+        +update(T)
+        +delete(String)
+    }
+    class FileDao~T~ {
+        <<abstract>>
+        #Map~String,T~ data
+        #parse(String[])* T
+        #simpan()
+    }
+    class KamarDao
+    class TamuDao
+    class ReservasiDao
+    class PenggunaDao
+
+    class HotelException
+    class ValidasiException
+    class KamarTidakTersediaException
+    class DataAksesException
+
+    Persistable <|.. Kamar
+    Persistable <|.. Tamu
+    Persistable <|.. Reservasi
+    Persistable <|.. Pengguna
+    Kamar <|-- KamarStandard
+    Kamar <|-- KamarDeluxe
+    Kamar <|-- KamarSuite
+    Pengguna <|-- Admin
+    Pengguna <|-- Resepsionis
+    Reservasi --> "1" Tamu
+    Reservasi --> "1" Kamar
+    KamarFactory ..> Kamar : membuat
+
+    Dao <|.. FileDao
+    FileDao <|-- KamarDao
+    FileDao <|-- TamuDao
+    FileDao <|-- ReservasiDao
+    FileDao <|-- PenggunaDao
+
+    HotelException <|-- ValidasiException
+    HotelException <|-- KamarTidakTersediaException
+    HotelException <|-- DataAksesException

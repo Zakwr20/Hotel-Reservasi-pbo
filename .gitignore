@@ -1,0 +1,12 @@
+# hasil kompilasi Eclipse
+bin/
+*.class
+
+# data runtime (dibuat otomatis saat aplikasi pertama kali dijalankan)
+data/
+data-uji/
+*.tmp
+
+# file sistem
+.DS_Store
+Thumbs.db
